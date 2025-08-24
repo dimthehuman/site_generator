@@ -1,18 +1,32 @@
-from textnode import TextNode, TextType
-from htmlnode import HTMLNode
-from leafnode import LeafNode
+import os
+import shutil
+import sys
+
+from copystatic import copy_files_recursive
+from gencontent import generate_pages_recursive
+
+
+dir_path_static = "./static"
+dir_path_public = "./docs"
+dir_path_content = "./content"
+template_path = "./template.html"
+default_basepath = "/"
+
 
 def main():
-    # new_textnode = TextNode("text", TextType.LINK, "https://www.boot.dev")
-    # print(new_textnode)
+    basepath = default_basepath
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
 
-    # new_htmlnode = HTMLNode("p", "value text", "a", {"href": "https://www.google.com", "target": "_blank"})
-    # print(new_htmlnode.props_to_html())
-    # print(new_htmlnode)
+    print("Deleting public directory...")
+    if os.path.exists(dir_path_public):
+        shutil.rmtree(dir_path_public)
 
-    new_leafnode = LeafNode("p", "This is a paragraph of text.")
-    print(new_leafnode.to_html())
+    print("Copying static files to public directory...")
+    copy_files_recursive(dir_path_static, dir_path_public)
 
+    print("Generating content...")
+    generate_pages_recursive(dir_path_content, template_path, dir_path_public, basepath)
 
 
 main()
